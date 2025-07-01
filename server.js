@@ -47,34 +47,52 @@ app.post('/api/gemini', async (req, res) => {
   }
 });
 
-//////////// Agent LETTA ///////////////
+//////////// Agent flowise ///////////////
 
 // AGENT FILM
+
 app.post("/api/agent-film", async (req, res) => {
   try {
-    const { messages } = req.body;
+    const { messages, genre } = req.body;
     const prompt = messages?.[0]?.content;
-    const response = await fetch(`http://localhost:3000/api/v1/prediction/b8b4bc28-5a60-43c1-82c4-aad3c8158f28`, {
+      // Intégrer le genre directement dans le message
+    const enhancedPrompt = `${prompt} (Genre: ${genre})`;
+    console.log("Prompt modifié:", enhancedPrompt);
+  const bodyToSend = {
+      question: enhancedPrompt, // ou message ? faut il supprimer input ? 
+    };
+
+    console.log("Requete recue - prompt:", prompt);
+    console.log("Requete recue - genre:", genre);
+
+
+    console.log("Body envoyé à Flowise:", JSON.stringify(bodyToSend, null, 2));
+
+  const response = await fetch(`http://localhost:3000/api/v1/prediction/b8b4bc28-5a60-43c1-82c4-aad3c8158f28`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.FLOWISE}`,
       },
-      body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify(bodyToSend),
     });
 
+    const text = await response.text();
+    console.log("Réponse brute Flowise:", text);
+
     if (!response.ok) {
-      return res.status(response.status).json({ error: "Erreur LettA film : " + response.statusText });
+      return res.status(response.status).json({ error: "Erreur flowise film : " + response.statusText, details: text });
     }
 
-    const data = await response.json();
+    const data = JSON.parse(text);
     res.json(data);
-    console.log("Réponse FLOWISE film:", data);
+
   } catch (error) {
-    console.error("Erreur backend FLOWISE film:", error);
+    console.error("Erreur backend FLOWISE film:", error.stack || error);
     res.status(500).json({ error: "Erreur serveur backend FLOWISE film" });
   }
 });
+
 // AGENT MUSIQUE
 app.post("/api/agent-musique", async (req, res) => {
   try {

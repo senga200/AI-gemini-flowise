@@ -121,24 +121,25 @@ propositionButtonsFilm.forEach((btn) => {
 const genre = genreMap[genreLabel] || genreLabel;
 
         //const genre = btn.innerText.trim().toLowerCase();
-        const prompt = `
-Tu es un assistant virtuel spécialisé dans la recommandation de films. Ta mission est de me proposer **une suggestion de film pertinente et variée** à regarder en fonction du genre que je t'indique. **Essaie d'éviter de répéter les mêmes suggestions ou de choisir systématiquement les films les plus populaires ou les plus évidents du genre demandé.**
+        // le prompt est maintenant dans flowise
+//         const prompt = `
+// Tu es un assistant virtuel spécialisé dans la recommandation de films. Ta mission est de me proposer **une suggestion de film pertinente et variée** à regarder en fonction du genre que je t'indique. **Essaie d'éviter de répéter les mêmes suggestions ou de choisir systématiquement les films les plus populaires ou les plus évidents du genre demandé.**
 
-Quand je te demande :
-    "Propose-moi un film ${genre}."
+// Quand je te demande :
+//     "Propose-moi un film ${genre}."
 
-Tu dois **impérativement** répondre **UNIQUEMENT** avec le JSON suivant, sans aucune phrase d'introduction, d'explication ou de conclusion :
-{
-    "film": "Titre du film",                 
-    "genre": "${genre}",                     
-    "année": "Année de sortie",             
-    "synopsis": "Un court résumé pertinent."
-}
+// Tu dois **impérativement** répondre **UNIQUEMENT** avec le JSON suivant, sans aucune phrase d'introduction, d'explication ou de conclusion :
+// {
+//     "film": "Titre du film",                 
+//     "genre": "${genre}",                     
+//     "année": "Année de sortie",             
+//     "synopsis": "Un court résumé pertinent."
+// }
 
-**Important :** La clé pour varier les suggestions est de ne pas toujours choisir le film le plus connu pour le genre ${genre}. Explore des options peut-être un peu moins courantes mais toujours représentatives et de qualité.
+// **Important :** La clé pour varier les suggestions est de ne pas toujours choisir le film le plus connu pour le genre ${genre}. Explore des options peut-être un peu moins courantes mais toujours représentatives et de qualité.
 
-Maintenant, exécute la tâche : propose-moi un film ${genre} en respectant **strictement** ce format JSON et les instructions de variété.
-        `;
+// Maintenant, exécute la tâche : propose-moi un film ${genre} en respectant **strictement** ce format JSON et les instructions de variété.
+//         `;
 
         try {
             const response = await fetch("/api/agent-film", {
@@ -151,9 +152,11 @@ Maintenant, exécute la tâche : propose-moi un film ${genre} en respectant **st
                     messages: [
                         {
                             role: "user",
-                            content: prompt
+                           // content: prompt
+                            content: `Propose-moi un film ${genre}.`
                         }
-                    ]
+                    ],
+                    genre: genre,
                 }),
             });
 
@@ -178,7 +181,7 @@ Maintenant, exécute la tâche : propose-moi un film ${genre} en respectant **st
             `;
             resultAgentFilm.style.display = "block";
         } catch (error) {
-            console.error("Erreur attrapée letta film:", error);
+            console.error("Erreur backend FLOWISE film:", error.stack || error);
             resultAgentFilm.innerHTML = "❌ Une erreur est survenue lors de la génération.";
             resultAgentFilm.style.display = "block";
         }
