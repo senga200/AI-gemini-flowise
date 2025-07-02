@@ -1,4 +1,7 @@
-
+const API_BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3001"
+    : "http://51.38.186.158:3001"; 
 // --------------- BLOC 1 : TEXTE ------------------
 const submitButtonText = document.getElementById("submitBtnText");
 const inputText = document.getElementById("promptText");
@@ -11,7 +14,7 @@ submitButtonText.addEventListener("click", async (e) => {
     let inputValue = inputText.value;
 
     try {
-        let response = await fetch(`/api/gemini`, {
+        let response = await fetch(`${API_BASE_URL}/api/gemini`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -60,7 +63,7 @@ submitButton.addEventListener("click", async (e) => {
             let image = reader.result;
             let imageBase64 = image.split(",")[1];
 
-            let response = await fetch(`/api/gemini`, {
+            let response = await fetch(`${API_BASE_URL}/api/gemini`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -142,7 +145,7 @@ const genre = genreMap[genreLabel] || genreLabel;
 //         `;
 
         try {
-            const response = await fetch("/api/agent-film", {
+            const response = await fetch(`${API_BASE_URL}/api/agent-film`, {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
@@ -249,7 +252,7 @@ submitButtonAgent.addEventListener("click", async (e) => {
     `;
 
     try {
-        const response = await fetch(`/api/agent-musique`, {
+        const response = await fetch(`${API_BASE_URL}/api/agent-musique`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({

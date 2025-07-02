@@ -50,7 +50,7 @@ app.post('/api/gemini', async (req, res) => {
 //////////// Agent flowise ///////////////
 
 // AGENT FILM
-
+const FLOWCHART_FILM_ID = process.env.FLOWISE_FLOWCHART_FILM_ID;
 app.post("/api/agent-film", async (req, res) => {
   try {
     const { messages, genre } = req.body;
@@ -68,7 +68,7 @@ app.post("/api/agent-film", async (req, res) => {
 
     console.log("Body envoyé à Flowise:", JSON.stringify(bodyToSend, null, 2));
 
-  const response = await fetch(`http://localhost:3000/api/v1/prediction/b8b4bc28-5a60-43c1-82c4-aad3c8158f28`, {
+  const response = await fetch(`http://localhost:3000/api/v1/prediction/${FLOWCHART_FILM_ID}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ app.post("/api/agent-film", async (req, res) => {
 });
 
 // AGENT MUSIQUE
-
+const FLOWCHART_MUSIQUE_ID = process.env.FLOWISE_FLOWCHART_MUSIQUE_ID;
 app.post("/api/agent-musique", async (req, res) => {
   try {
     //const { prompt } = req.body;
@@ -113,7 +113,7 @@ app.post("/api/agent-musique", async (req, res) => {
     };
     console.log("Body envoyé à Flowise musique:", JSON.stringify(bodyToSend, null, 2));
 
-    const response = await fetch(`http://localhost:3000/api/v1/prediction/39cbe58f-1db0-4b3e-8412-feeaab65bb9f`, {
+    const response = await fetch(`http://localhost:3000/api/v1/prediction/${FLOWCHART_MUSIQUE_ID}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
