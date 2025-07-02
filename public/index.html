@@ -16,6 +16,7 @@
             <h2>Pose une question au format texte</h2>
             <i class="fa-solid fa-font"></i>
         </div>
+            <p class="model">Modèle gemini</p>
         <form onsubmit="return false;">
             <div class="prompt-box">
                 <label>
@@ -35,11 +36,12 @@
             <h2>Pose une question d'après l'image</h2> 
             <i class="fa-solid fa-image"></i>
         </div>
+        <p class="model">Modèle gemini</p>
         <form onsubmit="return false;">
-            <input type="file" id="chosenImage" name="chosen-image">
+            <input type="file" id="chosenImage" name="chosen-image" accept="image/png, image/jpeg, image/jpg, image/svg+xml">
             <div class="prompt-box">
                 <label>
-                    <p>Pose une question concernant l'image, par exemple : "que représente l'image"</p>
+                    <p>Pose une question concernant l'image, par exemple : "que représente l'image" (jpg uniquement)</p>
                 <input name="prompt" id="prompt" placeholder="poser la question..." type="text"
                 value="" style="padding-left: 10px;">
                 </label>
@@ -55,6 +57,7 @@
             <h2>Demande à l'agent cinéfile de proposer un film à regarder ce soir</h2>
             <i class="fa-solid fa-film"></i>
         </div>
+        <p class="model">Agent Flowise - Mistral AI</p>
         <form onsubmit="return false;">
             <div class="prompt-box">
             </div>
@@ -72,6 +75,7 @@
             <h2>L'agent spécialisé dans la musique des années 1970 à 2000 pose une question</h2>
             <i class="fa-solid fa-music"></i>
         </div>
+        <p class="model">Agent Flowise - Mistral AI</p>
         <form onsubmit="return false;">
             <div class="prompt-box">
                 <label>

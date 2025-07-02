@@ -146,6 +146,16 @@ h2 {
 }
 
 
+.model {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
+    font-style: italic;
+    color: #7a7a7a;
+}
+
+
 @media (max-width: 700px) {
     .bloc-text,
     .bloc-image,

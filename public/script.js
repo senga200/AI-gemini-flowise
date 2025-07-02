@@ -1,3 +1,26 @@
+function canMakeRequest() {
+  const maxRequests = 5;
+  const intervalMs = 60 * 60 * 1000; // 1 heure
+
+  // recup les timestamps stockés, ou tableau vide
+  let timestamps = JSON.parse(localStorage.getItem("requestTimestamps") || "[]");
+
+  // Nettoie les timestamps > 1h (+ vieux)
+  const now = Date.now();
+  timestamps = timestamps.filter(ts => now - ts < intervalMs);
+
+  if (timestamps.length >= maxRequests) {
+    return false; 
+  }
+
+  // Sinon, ajoute le timestamp courant et stocke
+  timestamps.push(now);
+  localStorage.setItem("requestTimestamps", JSON.stringify(timestamps));
+  return true;
+}
+
+
+
 const API_BASE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:3001"
@@ -9,6 +32,10 @@ const resultText = document.querySelector(".text-result");
 
 submitButtonText.addEventListener("click", async (e) => {
     e.preventDefault();
+    if (!canMakeRequest()) {
+  alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
+  return; 
+}
 
     resultText.innerHTML = "Recherche en cours...";
     let inputValue = inputText.value;
@@ -45,6 +72,10 @@ const fileInput = document.getElementById("chosenImage");
 
 submitButton.addEventListener("click", async (e) => {
     e.preventDefault();
+        if (!canMakeRequest()) {
+  alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
+  return; 
+}
 
     result.innerHTML = "Recherche en cours...";
     let inputValue = input.value;
@@ -54,6 +85,7 @@ submitButton.addEventListener("click", async (e) => {
         result.innerHTML = "Aucun fichier sélectionné.";
         return;
     }
+    
 
     let reader = new FileReader();
 //split pour recuperer après la virgule : data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD etc...
@@ -109,7 +141,10 @@ const resultAgentFilm = document.querySelector(".agent-result-film");
 propositionButtonsFilm.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
         e.preventDefault();
-
+    if (!canMakeRequest()) {
+  alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
+  return; 
+}
         // Enlever la sélection précédente
         for (const btn of propositionButtonsFilm) {
             btn.classList.remove("selected");
@@ -200,6 +235,10 @@ const propositionButtons = document.querySelectorAll(".proposition");
 
 submitButtonAgent.addEventListener("click", async (e) => {
     e.preventDefault();
+        if (!canMakeRequest()) {
+  alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
+  return; 
+}
 
     resultAgent.style.display = "none";
     resultAgent.innerHTML = "";
