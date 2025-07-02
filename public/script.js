@@ -153,7 +153,7 @@ const genre = genreMap[genreLabel] || genreLabel;
                         {
                             role: "user",
                            // content: prompt
-                            content: `Propose-moi un film ${genre}.`
+                            //content: `Propose-moi un film ${genre}.`
                         }
                     ],
                     genre: genre,
@@ -220,9 +220,9 @@ submitButtonAgent.addEventListener("click", async (e) => {
     
     Tu me réponds :
     {
-      "question": "Qui a sorti l'album 'Thriller' en 1982 ?",
-      "propositions": ["Prince", "Michael Jackson", "Stevie Wonder", "Madonna"],
-      "bonneReponse": "Michael Jackson"
+    "question": "Qui a sorti l'album 'Thriller' en 1982 ?",
+    "propositions": ["Prince", "Michael Jackson", "Stevie Wonder", "Madonna"],
+    "bonneReponse": "Michael Jackson"
     }
     
     Si je te demande :
@@ -230,9 +230,9 @@ submitButtonAgent.addEventListener("click", async (e) => {
     
     Tu me réponds :
     {
-      "question": "Quel groupe a chanté 'Bohemian Rhapsody' ?",
-      "propositions": ["Queen", "Pink Floyd", "The Beatles", "Led Zeppelin"],
-      "bonneReponse": "Queen"
+    "question": "Quel groupe a chanté 'Bohemian Rhapsody' ?",
+    "propositions": ["Queen", "Pink Floyd", "The Beatles", "Led Zeppelin"],
+    "bonneReponse": "Queen"
     }
     
     Si je te demande :
@@ -240,50 +240,51 @@ submitButtonAgent.addEventListener("click", async (e) => {
     
     Tu me réponds :
     {
-      "question": "Quelle chanteuse française a interprété 'Joe le taxi' ?",
-      "propositions": ["France Gall", "Mylène Farmer", "Vanessa Paradis", "Patricia Kaas"],
-      "bonneReponse": "Vanessa Paradis"
+    "question": "Quelle chanteuse française a interprété 'Joe le taxi' ?",
+    "propositions": ["France Gall", "Mylène Farmer", "Vanessa Paradis", "Patricia Kaas"],
+    "bonneReponse": "Vanessa Paradis"
     }
 
     Maintenant, génère UNE NOUVELLE question originale dans le même style, avec le même format JSON STRICTEMENT, sans ajouter de commentaires ni de texte hors du JSON.
     `;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text: prompt }] }]
-            }),
-        });
+        const response = await fetch(`/api/agent-musique`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    messages: [{ role: "user", content: prompt }],
+    propositions: ["A", "B", "C", "D"]
+  }),
+});
 
-        if (!response.ok) throw new Error("Erreur API : " + response.statusText);
+if (!response.ok) throw new Error("Erreur API : " + response.statusText);
+// const data = await response.json
+ // let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        // // Nettoyage du JSON (suppression éventuelle des ```json et ```)
+        // resultText = resultText.replace(/```json|```/g, "").trim();
+        // const quiz = JSON.parse(resultText);
+const quiz = await response.json();
 
-        const data = await response.json();
-        let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        // Nettoyage du JSON (suppression éventuelle des ```json et ```)
-        resultText = resultText.replace(/```json|```/g, "").trim();
-        
-        const quiz = JSON.parse(resultText);
+generatedQuestionElement.innerHTML = quiz.question;
 
-        generatedQuestionElement.innerHTML = quiz.question;
+propositionButtons.forEach((btn, index) => {
+  btn.textContent = quiz.propositions[index];
+  btn.style.display = "inline-block";
 
-        propositionButtons.forEach((btn, index) => {
-            btn.textContent = quiz.propositions[index];
-            btn.style.display = "inline-block";
+  btn.onclick = () => {
+    if (quiz.propositions[index] === quiz.bonneReponse) {
+      resultAgent.innerHTML = "✅ Bonne réponse !";
+      resultAgent.style.color = "green";
+    } else {
+      resultAgent.innerHTML = `❌ Mauvaise réponse.`;
+      resultAgent.style.color = "red";
+    }
+    resultAgent.style.display = "block";
+   // console.log(`La bonne réponse est : ${quiz.bonneReponse}`);
+  };
+});
 
-            btn.onclick = () => {
-                if (quiz.propositions[index] === quiz.bonneReponse) {
-                    resultAgent.innerHTML = "✅ Bonne réponse !";
-                    resultAgent.style.color = "green";
-                } else {
-                    resultAgent.innerHTML = `❌ Mauvaise réponse. `;
-                    resultAgent.style.color = "red";
-                }
-                resultAgent.style.display = "block";
-                console.log(`La bonne réponse est : ${quiz.bonneReponse}`);
-            };
-        });
     } catch (error) {
         console.error("Erreur attrapée :", error);
         resultAgent.innerHTML = "❌ Une erreur est survenue lors de la génération.";

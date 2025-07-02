@@ -94,39 +94,67 @@ app.post("/api/agent-film", async (req, res) => {
 });
 
 // AGENT MUSIQUE
+
 app.post("/api/agent-musique", async (req, res) => {
   try {
-    const { prompt } = req.body;
-    console.log("Requête LettA musique:", prompt);
-    const response = await fetch(`https://api.letta.com/v1/agents/${process.env.LETTA_AGENT_MUSIQUE}/messages`, {
+    //const { prompt } = req.body;
+    const { messages, propositions } = req.body;
+    const prompt = messages?.[0]?.content;
+    //      const enhancedPrompt = `${prompt} (Propositions: ${propositions.join(', ')})`;
+    //     console.log("Prompt modifié pour musique:", enhancedPrompt);
+    if (!prompt || !propositions) {
+      return res.status(400).json({ error: "Données invalides : prompt ou propositions manquants" });
+    }
+    console.log("prompt", prompt);
+    console.log("propositions", propositions);
+    const bodyToSend = {
+      question: prompt,
+      propositions,
+    };
+    console.log("Body envoyé à Flowise musique:", JSON.stringify(bodyToSend, null, 2));
+
+    const response = await fetch(`http://localhost:3000/api/v1/prediction/39cbe58f-1db0-4b3e-8412-feeaab65bb9f`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.LETTA_API_KEY}`,
+        Authorization: `Bearer ${process.env.FLOWISE}`,
       },
-      body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
+//body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify(bodyToSend),
     });
 
+    const text = await response.text();
+    console.log("Réponse brute Flowise musique:", text);
+
     if (!response.ok) {
-      return res.status(response.status).json({ error: "Erreur LettA musique : " + response.statusText });
+      return res.status(response.status).json({ error: `Erreur Flowise: ${response.statusText}` });
     }
 
-    const data = await response.json();
-    res.json(data);
-    console.log("Réponse LettA musique:", data);
+    // Premier parse JSON
+    const data = JSON.parse(text);
+    console.log("Données JSON reçues:", data);
+
+    // Puis parse la chaîne JSON dans data.text
+    let quizData;
+    try {
+      quizData = JSON.parse(data.text);
+    } catch (err) {
+      console.error("Erreur de parsing JSON imbriqué dans data.text:", err);
+      return res.status(500).json({ error: "Erreur de parsing JSON imbriqué", details: err.message });
+    }
+
+    // Envoie uniquement l'objet quiz propre
+    res.json(quizData);
+
   } catch (error) {
-    console.error("Erreur backend LettA musique:", error);
-    res.status(500).json({ error: "Erreur serveur backend LettA musique" });
+    console.error("Erreur backend musique:", error);
+    res.status(500).json({ error: "Erreur serveur backend musique", details: error.message });
   }
 });
 
 
+///////////////////////////////////////////
 const PORT = process.env.PORT || 3001;
-
-
-
-
-
 
 app.listen(PORT, '0.0.0.0', () => console.log(`server ecoute sur http://0.0.0.0:${PORT}`));
 
