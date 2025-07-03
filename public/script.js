@@ -1,3 +1,27 @@
+
+let API_BASE_URL = "";
+
+async function initAPIBaseURL() {
+  const configRoute = window.location.hostname === "localhost" ? "/api/config-local" : "/api/config";
+
+  try {
+    const res = await fetch(configRoute);
+    const data = await res.json();
+    API_BASE_URL = data.ip;
+    console.log("✅ API_BASE_URL défini à :", API_BASE_URL);
+  } catch (error) {
+    console.error("❌ Erreur lors de la récupération de l'IP : ", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await initAPIBaseURL(); // Appel dès que la page est prête
+});
+
+// blocage des requêtes trop fréquentes
+// Limite à 5 requêtes par heure
+// Utilise localStorage pour stocker les timestamps des requêtes (à optimiser)
+// Nettoie les timestamps plus vieux d'une heure
 function canMakeRequest() {
   const maxRequests = 5;
   const intervalMs = 60 * 60 * 1000; // 1 heure
@@ -20,11 +44,6 @@ function canMakeRequest() {
 }
 
 
-
-const API_BASE_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3001"
-    : "http://51.38.186.158:3001"; 
 // --------------- BLOC 1 : TEXTE ------------------
 const submitButtonText = document.getElementById("submitBtnText");
 const inputText = document.getElementById("promptText");
@@ -32,6 +51,9 @@ const resultText = document.querySelector(".text-result");
 
 submitButtonText.addEventListener("click", async (e) => {
     e.preventDefault();
+      if (!API_BASE_URL) {
+    await initAPIBaseURL(); // attendre la récup de l url
+  }
     if (!canMakeRequest()) {
   alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
   return; 
@@ -45,7 +67,9 @@ submitButtonText.addEventListener("click", async (e) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text: inputValue }] }]
+                contents: [{ 
+                    role: "user", 
+                    parts: [{ text: inputValue }] }]
             }),
         });
 
@@ -72,6 +96,9 @@ const fileInput = document.getElementById("chosenImage");
 
 submitButton.addEventListener("click", async (e) => {
     e.preventDefault();
+    if (!API_BASE_URL) {
+    await initAPIBaseURL(); // attendre la récup de l url
+  }
         if (!canMakeRequest()) {
   alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
   return; 
@@ -128,7 +155,7 @@ submitButton.addEventListener("click", async (e) => {
 const propositionButtonsFilm = document.querySelectorAll(".propositionFilm");
 const resultAgentFilm = document.querySelector(".agent-result-film");
 
-        const genreMap = {
+const genreMap = {
     "drame": "drame",
     "comédie": "comédie",
     "science fiction": "science-fiction",
@@ -141,10 +168,13 @@ const resultAgentFilm = document.querySelector(".agent-result-film");
 propositionButtonsFilm.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
         e.preventDefault();
-    if (!canMakeRequest()) {
-  alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
-  return; 
-}
+        if (!API_BASE_URL) {
+        await initAPIBaseURL(); // attendre la récup de l url
+        }
+        if (!canMakeRequest()) {
+        alert("Trop de requêtes effectuées. Veuillez réessayer plus tard");
+        return; 
+        }
         // Enlever la sélection précédente
         for (const btn of propositionButtonsFilm) {
             btn.classList.remove("selected");
@@ -156,7 +186,7 @@ propositionButtonsFilm.forEach((btn) => {
 
 
         const genreLabel = btn.innerText.trim().toLowerCase();
-const genre = genreMap[genreLabel] || genreLabel;
+        const genre = genreMap[genreLabel] || genreLabel;
 
         //const genre = btn.innerText.trim().toLowerCase();
         // le prompt est maintenant dans flowise
@@ -235,9 +265,12 @@ const propositionButtons = document.querySelectorAll(".proposition");
 
 submitButtonAgent.addEventListener("click", async (e) => {
     e.preventDefault();
-        if (!canMakeRequest()) {
-  alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
-  return; 
+    if (!API_BASE_URL) {
+    await initAPIBaseURL(); // attendre la récup de l url
+  }
+    if (!canMakeRequest()) {
+    alert("Trop de requêtes effectuées. Veuillez réessayer plus tard.");
+    return; 
 }
 
     resultAgent.style.display = "none";
@@ -250,54 +283,58 @@ submitButtonAgent.addEventListener("click", async (e) => {
     generatedQuestionElement.innerHTML = "🎵 Génération de la question musicale en cours...🎵";
     generatedQuestionElement.style.display = "block";
 
-    const prompt = `
-    Tu es un générateur de questions de quiz musical, spécialisé dans la musique française et anglo-saxonne entre 1970 et 2000.
+    // le prompt est maintenant dans flowise 🥳
+    // const prompt = `
+    // Tu es un générateur de questions de quiz musical, spécialisé dans la musique française et anglo-saxonne entre 1970 et 2000.
 
-    Ta mission est de générer UNE SEULE question originale de type Trivial Pursuit, avec 4 propositions (A, B, C, D), dont une seule est correcte.
+    // Ta mission est de générer UNE SEULE question originale de type Trivial Pursuit, avec 4 propositions (A, B, C, D), dont une seule est correcte.
 
-    Voici des exemples de ce qu'on attend de toi :
+    // Voici des exemples de ce qu'on attend de toi :
 
-    Si je te demande :
-    "Qui a sorti l'album 'Thriller' en 1982 ?"
+    // Si je te demande :
+    // "Qui a sorti l'album 'Thriller' en 1982 ?"
     
-    Tu me réponds :
-    {
-    "question": "Qui a sorti l'album 'Thriller' en 1982 ?",
-    "propositions": ["Prince", "Michael Jackson", "Stevie Wonder", "Madonna"],
-    "bonneReponse": "Michael Jackson"
-    }
+    // Tu me réponds :
+    // {
+    // "question": "Qui a sorti l'album 'Thriller' en 1982 ?",
+    // "propositions": ["Prince", "Michael Jackson", "Stevie Wonder", "Madonna"],
+    // "bonneReponse": "Michael Jackson"
+    // }
     
-    Si je te demande :
-    "Quel groupe a chanté 'Bohemian Rhapsody' ?"
+    // Si je te demande :
+    // "Quel groupe a chanté 'Bohemian Rhapsody' ?"
     
-    Tu me réponds :
-    {
-    "question": "Quel groupe a chanté 'Bohemian Rhapsody' ?",
-    "propositions": ["Queen", "Pink Floyd", "The Beatles", "Led Zeppelin"],
-    "bonneReponse": "Queen"
-    }
+    // Tu me réponds :
+    // {
+    // "question": "Quel groupe a chanté 'Bohemian Rhapsody' ?",
+    // "propositions": ["Queen", "Pink Floyd", "The Beatles", "Led Zeppelin"],
+    // "bonneReponse": "Queen"
+    // }
     
-    Si je te demande :
-    "Quelle chanteuse française a interprété 'Joe le taxi' ?"
+    // Si je te demande :
+    // "Quelle chanteuse française a interprété 'Joe le taxi' ?"
     
-    Tu me réponds :
-    {
-    "question": "Quelle chanteuse française a interprété 'Joe le taxi' ?",
-    "propositions": ["France Gall", "Mylène Farmer", "Vanessa Paradis", "Patricia Kaas"],
-    "bonneReponse": "Vanessa Paradis"
-    }
+    // Tu me réponds :
+    // {
+    // "question": "Quelle chanteuse française a interprété 'Joe le taxi' ?",
+    // "propositions": ["France Gall", "Mylène Farmer", "Vanessa Paradis", "Patricia Kaas"],
+    // "bonneReponse": "Vanessa Paradis"
+    // }
 
-    Maintenant, génère UNE NOUVELLE question originale dans le même style, avec le même format JSON STRICTEMENT, sans ajouter de commentaires ni de texte hors du JSON.
-    `;
+    // Maintenant, génère UNE NOUVELLE question originale dans le même style, avec le même format JSON STRICTEMENT, sans ajouter de commentaires ni de texte hors du JSON.
+    // `;
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/agent-musique`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    messages: [{ role: "user", content: prompt }],
-    propositions: ["A", "B", "C", "D"]
-  }),
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+        messages:[{ 
+            role: "user", 
+            content: prompt 
+            }],
+        propositions: ["A", "B", "C", "D"]
+        }),
 });
 
 if (!response.ok) throw new Error("Erreur API : " + response.statusText);

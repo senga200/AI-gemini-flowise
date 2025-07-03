@@ -21,6 +21,16 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// VPS 
+app.get('/api/config', (req, res) => {
+  res.json({ ip: process.env.IP_VPS });
+});
+
+// localhost en local
+app.get('/api/config-local', (req, res) => {
+  res.json({ ip: process.env.IP_LOCAL });
+});
+
 
 
 //////////////GEMINI API////////////////////
