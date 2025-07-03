@@ -8,7 +8,6 @@ async function initAPIBaseURL() {
     const res = await fetch(configRoute);
     const data = await res.json();
     API_BASE_URL = data.ip;
-    console.log("✅ API_BASE_URL défini à :", API_BASE_URL);
   } catch (error) {
     console.error("❌ Erreur lors de la récupération de l'IP : ", error);
   }
@@ -222,6 +221,8 @@ propositionButtonsFilm.forEach((btn) => {
 
             const data = await response.json();
             console.log("Réponse brute :", data);
+            console.log("Réponse brute JSON :", JSON.stringify(data, null, 2));
+        
 
            // let resultText = data?.messages?.[1]?.content || "";
            let resultText = data?.text || "";

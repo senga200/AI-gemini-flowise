@@ -1,5 +1,8 @@
 body {
-    background-color: #f4f7fc;
+    /*background-color: #f4f7fc;*/
+    background-image: url(bg.jpeg);
+    background-attachment: fixed;
+    background-size: cover;
     font-family: 'Segoe UI', sans-serif;
     line-height: 1.5;
     color: #333;
@@ -105,8 +108,10 @@ button:active {
 .result,
 .text-result,
 .agent-result {
-    margin-top: 20px;
-    font-weight: bold;
+    background: #f0f9f7;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #cce0dd;
 }
 
 .agent-result {
