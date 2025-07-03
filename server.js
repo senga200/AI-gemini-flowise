@@ -63,12 +63,16 @@ app.post('/api/gemini', async (req, res) => {
 const FLOWCHART_FILM_ID = process.env.FLOWISE_FLOWCHART_FILM_ID;
 app.post("/api/agent-film", async (req, res) => {
   try {
-    const { messages } = req.body;
-    const genre = req.body.genre; 
+const { messages, genre } = req.body;
+    const prompt = messages?.[0]?.content;
+      // Intégrer le genre directement dans le message
+    const enhancedPrompt = `${prompt} (Genre: ${genre})`;
+    console.log("Prompt modifié:", enhancedPrompt); 
   const bodyToSend = {
-      messages: messages, 
-      genre: genre, 
+ question: enhancedPrompt, 
     };
+    
+    console.log("Requete recue - prompt:", prompt);
     console.log("Requete recue - genre:", genre);
     console.log("Body envoyé à Flowise:", JSON.stringify(bodyToSend, null, 2));
 
