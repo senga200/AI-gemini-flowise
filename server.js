@@ -63,18 +63,15 @@ app.post('/api/gemini', async (req, res) => {
 const FLOWCHART_FILM_ID = process.env.FLOWISE_FLOWCHART_FILM_ID;
 app.post("/api/agent-film", async (req, res) => {
   try {
-const { messages, genre } = req.body;
-    const prompt = messages?.[0]?.content;
-      // Intégrer le genre directement dans le message
-    const enhancedPrompt = `${prompt} (Genre: ${genre})`;
-    console.log("Prompt modifié:", enhancedPrompt); 
+ const { messages } = req.body;
+    const genre = req.body.genre; 
   const bodyToSend = {
- question: enhancedPrompt, 
+      messages: messages, 
+      genre: genre, 
     };
-    
-    console.log("Requete recue - prompt:", prompt);
     console.log("Requete recue - genre:", genre);
     console.log("Body envoyé à Flowise:", JSON.stringify(bodyToSend, null, 2));
+
 
   const response = await fetch(`http://localhost:3000/api/v1/prediction/${FLOWCHART_FILM_ID}`, {
       method: "POST",
