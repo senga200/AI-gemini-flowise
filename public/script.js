@@ -155,16 +155,6 @@ submitButton.addEventListener("click", async (e) => {
 const propositionButtonsFilm = document.querySelectorAll(".propositionFilm");
 const resultAgentFilm = document.querySelector(".agent-result-film");
 
-const genreMap = {
-    "drame": "drame",
-    "comédie": "comédie",
-    "science fiction": "science-fiction",
-    "science-fiction": "science-fiction",
-    "action / aventure": "action-aventure",
-    "action/aventure": "action-aventure",
-    "familial": "familial"
-};
-
 propositionButtonsFilm.forEach((btn) => {
     btn.addEventListener("click", async (e) => {
         e.preventDefault();
@@ -186,7 +176,7 @@ propositionButtonsFilm.forEach((btn) => {
 
 
         const genreLabel = btn.innerText.trim().toLowerCase();
-        const genre = genreMap[genreLabel] || genreLabel;
+        const genre = genreLabel;
 
         //const genre = btn.innerText.trim().toLowerCase();
         // le prompt est maintenant dans flowise
@@ -255,6 +245,8 @@ propositionButtonsFilm.forEach((btn) => {
         }
     });
 });
+
+
 
 
 // --------------- BLOC 4 : AGENT QUIZZ MUSIQUE ------------------
@@ -331,18 +323,13 @@ submitButtonAgent.addEventListener("click", async (e) => {
         body: JSON.stringify({
         messages:[{ 
             role: "user", 
-            content: prompt 
+            //content: prompt 
             }],
         propositions: ["A", "B", "C", "D"]
         }),
 });
 
 if (!response.ok) throw new Error("Erreur API : " + response.statusText);
-// const data = await response.json
- // let resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        // // Nettoyage du JSON (suppression éventuelle des ```json et ```)
-        // resultText = resultText.replace(/```json|```/g, "").trim();
-        // const quiz = JSON.parse(resultText);
 const quiz = await response.json();
 
 generatedQuestionElement.innerHTML = quiz.question;

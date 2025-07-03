@@ -107,18 +107,12 @@ app.post("/api/agent-film", async (req, res) => {
 const FLOWCHART_MUSIQUE_ID = process.env.FLOWISE_FLOWCHART_MUSIQUE_ID;
 app.post("/api/agent-musique", async (req, res) => {
   try {
-    //const { prompt } = req.body;
-    const { messages, propositions } = req.body;
-    const prompt = messages?.[0]?.content;
-    //      const enhancedPrompt = `${prompt} (Propositions: ${propositions.join(', ')})`;
-    //     console.log("Prompt modifié pour musique:", enhancedPrompt);
-    if (!prompt || !propositions) {
+    const {propositions} = req.body;
+    if (!propositions) {
       return res.status(400).json({ error: "Données invalides : prompt ou propositions manquants" });
     }
-    console.log("prompt", prompt);
     console.log("propositions", propositions);
     const bodyToSend = {
-      question: prompt,
       propositions,
     };
     console.log("Body envoyé à Flowise musique:", JSON.stringify(bodyToSend, null, 2));
@@ -129,7 +123,6 @@ app.post("/api/agent-musique", async (req, res) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.FLOWISE}`,
       },
-//body: JSON.stringify({ messages: [{ role: "user", content: prompt }] }),
       body: JSON.stringify(bodyToSend),
     });
 
@@ -142,7 +135,7 @@ app.post("/api/agent-musique", async (req, res) => {
 
     // Premier parse JSON
     const data = JSON.parse(text);
-    console.log("Données JSON reçues:", data);
+    console.log("Données JSON reçues parse 1:", data);
 
     // Puis parse la chaîne JSON dans data.text
     let quizData;
@@ -152,8 +145,7 @@ app.post("/api/agent-musique", async (req, res) => {
       console.error("Erreur de parsing JSON imbriqué dans data.text:", err);
       return res.status(500).json({ error: "Erreur de parsing JSON imbriqué", details: err.message });
     }
-
-    // Envoie uniquement l'objet quiz propre
+    console.log("Données JSON reçues parse 2:", quizData);
     res.json(quizData);
 
   } catch (error) {
