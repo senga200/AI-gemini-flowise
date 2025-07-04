@@ -24,3 +24,7 @@ Le code est construit par bloc pour bien séparer les différentes fonctionnalit
 - Docker : pour l’agent IA ou les services associés
 
 ---
+
+
+Toujours en phase de test, et loin d'être fini, mais visible sur :
+http://vps-1b9fc044.vps.ovh.net:3001/
